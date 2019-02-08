@@ -23,4 +23,9 @@ requireAlphaNum xs =
     False -> Nothing
 
 
-    
+cleanWhitespace :: String -> Maybe String
+cleanWhitespace "" = Nothing
+cleanWhitespace (x : xs) =
+  case (isSpace x) of
+    True -> cleanWhitespace xs
+    False -> Just (x : xs)
