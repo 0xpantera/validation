@@ -42,3 +42,10 @@ passwordValidation password =
           case (checkPasswordLength password3) of
             Nothing -> Nothing
             Just password4 -> Just password4
+
+
+validatePassword :: String -> Maybe String
+validatePassword password =
+  cleanWhitespace password
+  >>= requireAlphaNum
+  >>= checkPasswordLength
