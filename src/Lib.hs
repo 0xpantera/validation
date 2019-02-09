@@ -1,51 +1,36 @@
 module Lib
-    ( checkPasswordLength
+    ( validatePassword
     ) where
 
 import Data.Char
 
 
-someFunc :: IO ()
-someFunc = putStrLn "someFunc"
-
-
-checkPasswordLength :: String -> Maybe String
+checkPasswordLength :: String -> Either String String
 checkPasswordLength password =
   case (length password > 20 || length password < 10) of
-    True -> Nothing
-    False -> Just password
+    True -> Left "Your password has to be between 10 and 20 characters long"
+    False -> Right password
 
 
-requireAlphaNum :: String -> Maybe String
+requireAlphaNum :: String -> Either String String
 requireAlphaNum xs =
   case (all isAlphaNum xs) of
-    True -> Just xs
-    False -> Nothing
+    True -> Right xs
+    False -> Left "Your password cannot contain whitespace or special characters."
 
 
-cleanWhitespace :: String -> Maybe String
-cleanWhitespace "" = Nothing
+cleanWhitespace :: String -> Either String String
+cleanWhitespace "" = Left "Your password cannot be empty"
 cleanWhitespace (x : xs) =
   case (isSpace x) of
     True -> cleanWhitespace xs
-    False -> Just (x : xs)
+    False -> Right (x : xs)
 
 
-passwordValidation :: String -> Maybe String
-passwordValidation password =
-  case (cleanWhitespace password) of
-    Nothing -> Nothing
-    Just password2 ->
-      case (requireAlphaNum password2) of
-        Nothing -> Nothing
-        Just password3 ->
-          case (checkPasswordLength password3) of
-            Nothing -> Nothing
-            Just password4 -> Just password4
-
-
-validatePassword :: String -> Maybe String
+validatePassword :: String -> Either String String
 validatePassword password =
   cleanWhitespace password
   >>= requireAlphaNum
   >>= checkPasswordLength
+
+
