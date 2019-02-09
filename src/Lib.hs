@@ -1,6 +1,4 @@
-module Lib
-    ( validatePassword
-    ) where
+module Lib where
 
 import Data.Char
 
