@@ -27,6 +27,13 @@ checkUsernameLength name =
     False -> Right (Username name)
 
 
+checkLength :: Int -> String -> Either Error String
+checkLength n field =
+  case (length field > n) of
+    True -> Left (Error ("Fields cannot be longer than " ++ (show n) ++ " characters"))
+    False -> Right field
+
+
 requireAlphaNum :: String -> Either Error String
 requireAlphaNum xs =
   case (all isAlphaNum xs) of
@@ -49,3 +56,16 @@ validatePassword (Password password) =
   >>= checkPasswordLength
 
 
+validateUsername :: Username -> Either Error Username
+validateUsername (Username username) =
+  cleanWhitespace username
+  >>= requireAlphaNum
+  >>= checkUsernameLength
+
+
+doValidateUsername :: Username -> Either Error Username
+doValidateUsername (Username username) =
+  do
+    cleanUser <- cleanWhitespace username
+    alphaNumUser <- requireAlphaNum cleanUser
+    checkUsernameLength alphaNumUser
