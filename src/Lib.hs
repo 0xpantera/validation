@@ -13,6 +13,10 @@ newtype Username = Username String
   deriving Show
 
 
+data User = User Username Password
+  deriving Show
+
+
 checkPasswordLength :: String -> Either Error Password
 checkPasswordLength password =
   case (length password > 20 || length password < 10) of
@@ -69,3 +73,9 @@ doValidateUsername (Username username) =
     cleanUser <- cleanWhitespace username
     alphaNumUser <- requireAlphaNum cleanUser
     checkUsernameLength alphaNumUser
+
+
+makeUser :: Username -> Password -> Either Error User
+makeUser name pass =
+  User <$> (validateUsername name)
+       <*> (validatePassword pass)

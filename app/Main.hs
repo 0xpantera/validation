@@ -10,8 +10,7 @@ main =
     username <- Username <$> getLine
     putStrLn "Please enter a password."
     password <- Password <$> getLine
-    print (validateUsername username)
-    print (validatePassword password)
+    print (makeUser username password)
 
 
 main2 :: IO ()
