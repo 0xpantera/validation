@@ -7,7 +7,7 @@ newtype Password = Password String
   deriving Show
 
 newtype Error = Error String
-  deriving Show
+  deriving (Show, Eq)
 
 newtype Username = Username String
   deriving Show
