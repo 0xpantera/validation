@@ -23,3 +23,11 @@ bindStringOrValue
   -> StringOrValue b
 bindStringOrValue (Str s) f = Str s
 bindStringOrValue (Val a) f = f a
+
+
+pureMaybe :: a -> Maybe a
+pureMaybe x = pure x
+
+
+pureEither :: a -> Either l a
+pureEither x = pure x

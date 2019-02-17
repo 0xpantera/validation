@@ -79,3 +79,10 @@ makeUser :: Username -> Password -> Either Error User
 makeUser name pass =
   User <$> (validateUsername name)
        <*> (validatePassword pass)
+
+
+makeUserTmpPassword :: Username -> Either Error User
+makeUserTmpPassword name =
+  User <$> validateUsername name
+       <*> pure (Password "temporaryPassword")
+
