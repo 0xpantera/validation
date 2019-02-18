@@ -1,4 +1,4 @@
-name:                validation
+name:                validation-user
 version:             0.1.0.0
 github:              "Francososa/validation"
 license:             BSD3
@@ -21,12 +21,13 @@ description:         Please see the README on GitHub at <https://github.com/Fran
 
 dependencies:
 - base >= 4.7 && < 5
+- validation
 
 library:
   source-dirs: src
 
 executables:
-  validation-exe:
+  validation-user-exe:
     main:                Main.hs
     source-dirs:         app
     ghc-options:
@@ -34,10 +35,10 @@ executables:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - validation
+    - validation-user
 
 tests:
-  validation-test:
+  validation-user-test:
     main:                Spec.hs
     source-dirs:         test
     ghc-options:
@@ -45,4 +46,4 @@ tests:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - validation
+    - validation-user
