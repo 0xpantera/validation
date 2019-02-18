@@ -23,18 +23,18 @@ eq n actual expected =
                  ])
 
 
-test :: IO ()
-test = printTestResult $
-  do
-    eq 1 (checkPasswordLength "123")
-      (Left (Error "Your password has to be between 10 and 20 characters long"))
-    eq 2 (checkPasswordLength "franklovesbooks")
-      (Right (Password "franklovesbooks"))
-    eq 3 (requireAlphaNum "this has spaces")
-      (Left (Error "Your password cannot contain whitespace or special characters."))
-    eq 4 (requireAlphaNum "thishasnospace123")
-      (Right "thishasnospace123")
-    eq 5 (cleanWhitespace "")
-      (Left (Error "Your password cannot be empty"))
-    eq 6 (cleanWhitespace " frankloves123")
-      (Right "frankloves123")
+--test :: IO ()
+--test = printTestResult $
+--  do
+--    eq 1 (checkPasswordLength "123")
+--      (Left (Error "Your password has to be between 10 and 20 characters long"))
+--    eq 2 (checkPasswordLength "franklovesbooks")
+--      (Right (Password "franklovesbooks"))
+--    eq 3 (requireAlphaNum "this has spaces")
+--      (Left (Error "Your password cannot contain whitespace or special characters."))
+--    eq 4 (requireAlphaNum "thishasnospace123")
+--      (Right "thishasnospace123")
+--    eq 5 (cleanWhitespace "")
+--      (Left (Error "Your password cannot be empty"))
+--    eq 6 (cleanWhitespace " frankloves123")
+--      (Right "frankloves123")
