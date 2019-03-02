@@ -95,3 +95,12 @@ makeUserTmpPassword name =
        <*> pure (Password "temporaryPassword")
 
 
+passwordErrors :: Password -> Validation Error Password
+passwordErrors password =
+  case validatePassword password of
+    Failure err -> Failure (Error ["Invalid password:"]
+                            <> err)
+    Success password2 -> Success password2
+
+
+    
