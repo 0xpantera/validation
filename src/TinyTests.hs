@@ -16,11 +16,11 @@ eq :: (Eq a, Show a) => Int -> a -> a -> Either Error ()
 eq n actual expected =
   case (actual == expected) of
     True -> Right ()
-    False -> Left (unlines
+    False -> Left (Error (
                  [ "Test " ++ show n
                  , "  Expected:  " ++ show expected
                  , "  But got:  " ++ show actual
-                 ])
+                 ]))
 
 
 --test :: IO ()
