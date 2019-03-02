@@ -103,4 +103,9 @@ passwordErrors password =
     Success password2 -> Success password2
 
 
-    
+usernameErrors :: Username -> Validation Error Username
+usernameErrors username =
+  case validateUsername username of
+    Failure err -> Failure (Error ["Invalid username:"]
+                            <> err)
+    Success username2 -> Success username2
