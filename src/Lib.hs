@@ -1,4 +1,5 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE ApplicativeDo #-}
 module Lib where
 
 import Data.Char
@@ -47,11 +48,11 @@ requireAlphaNum :: String -> Validation Error String
 requireAlphaNum xs =
   case (all isAlphaNum xs) of
     True -> Success xs
-    False -> Failure (Error ["Your password cannot contain whitespace or special characters."])
+    False -> Failure (Error ["Cannot contain whitespace or special characters."])
 
 
 cleanWhitespace :: String -> Validation Error String
-cleanWhitespace "" = Failure (Error ["Your password cannot be empty"])
+cleanWhitespace "" = Failure (Error ["Cannot be empty"])
 cleanWhitespace (x : xs) =
   case (isSpace x) of
     True -> cleanWhitespace xs
@@ -74,12 +75,12 @@ validateUsername (Username username) =
                          checkUsernameLength username2
 
 
-doValidateUsername :: Username -> Validation Error Username
-doValidateUsername (Username username) =
-  do
-    cleanUser <- cleanWhitespace username
-    alphaNumUser <- requireAlphaNum cleanUser
-    checkUsernameLength alphaNumUser
+--doValidateUsername :: Username -> Validation Error Username
+--doValidateUsername (Username username) =
+--  do
+--    cleanUser <- cleanWhitespace username
+--    alphaNumUser <- requireAlphaNum cleanUser
+--    checkUsernameLength alphaNumUser
 
 
 makeUser :: Username -> Password -> Validation Error User
