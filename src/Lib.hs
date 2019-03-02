@@ -85,8 +85,8 @@ validateUsername (Username username) =
 
 makeUser :: Username -> Password -> Validation Error User
 makeUser name pass =
-  User <$> (validateUsername name)
-       <*> (validatePassword pass)
+  User <$> (usernameErrors name)
+       <*> (passwordErrors pass)
 
 
 makeUserTmpPassword :: Username -> Validation Error User
@@ -109,3 +109,15 @@ usernameErrors username =
     Failure err -> Failure (Error ["Invalid username:"]
                             <> err)
     Success username2 -> Success username2
+
+
+displayErrors :: Username -> Password -> IO ()
+displayErrors name password =
+  case makeUser name password of
+    Failure err -> putStrLn (unlines (errorCoerce err))
+    Success (User (Username name) password) ->
+      putStrLn ("Welcome, " ++ name)
+
+
+errorCoerce :: Error -> [String]
+errorCoerce (Error err) = err   
