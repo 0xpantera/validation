@@ -1,21 +1,24 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE ApplicativeDo #-}
+{-# LANGUAGE OverloadedStrings #-}
 module Lib where
 
 import Data.Char
 import Data.Validation
 import Data.Semigroup
+import qualified Data.Text as T
+import qualified Data.Text.IO as TIO
 
 
-newtype Password = Password String
+newtype Password = Password T.Text
   deriving Show
 
 
-newtype Error = Error [String]
+newtype Error = Error [T.Text]
   deriving (Show, Semigroup)
 
 
-newtype Username = Username String
+newtype Username = Username T.Text
   deriving Show
 
 
@@ -23,40 +26,39 @@ data User = User Username Password
   deriving Show
 
 
-checkPasswordLength :: String -> Validation Error Password
+checkPasswordLength :: T.Text -> Validation Error Password
 checkPasswordLength password =
-  case (length password > 20 || length password < 10) of
+  case (T.length password > 20 || T.length password < 10) of
     True -> Failure (Error ["Your password has to be between 10 and 20 characters long"])
     False -> Success (Password password)
 
 
-checkUsernameLength :: String -> Validation Error Username
+checkUsernameLength :: T.Text -> Validation Error Username
 checkUsernameLength name =
-  case (length name > 15) of
+  case (T.length name > 15) of
     True -> Failure (Error ["Username cannot be longer than 15 characters."])
     False -> Success (Username name)
 
 
-checkLength :: Int -> String -> Validation Error String
+checkLength :: Int -> T.Text -> Validation Error T.Text
 checkLength n field =
-  case (length field > n) of
-    True -> Failure (Error ["Fields cannot be longer than " ++ (show n) ++ " characters"])
+  case (T.length field > n) of
+    True -> Failure (Error ["Fields cannot be longer than "
+                           <> (T.pack $ show n)
+                           <> " characters"])
     False -> Success field
 
 
-requireAlphaNum :: String -> Validation Error String
+requireAlphaNum :: T.Text -> Validation Error T.Text
 requireAlphaNum xs =
-  case (all isAlphaNum xs) of
+  case (T.all isAlphaNum xs) of
     True -> Success xs
     False -> Failure (Error ["Cannot contain whitespace or special characters."])
 
 
-cleanWhitespace :: String -> Validation Error String
+cleanWhitespace :: T.Text -> Validation Error T.Text
 cleanWhitespace "" = Failure (Error ["Cannot be empty"])
-cleanWhitespace (x : xs) =
-  case (isSpace x) of
-    True -> cleanWhitespace xs
-    False -> Success (x : xs)
+cleanWhitespace text = Success $ T.strip text
 
 
 validatePassword :: Password -> Validation Error Password
@@ -73,14 +75,6 @@ validateUsername (Username username) =
     Failure err -> Failure err
     Success username2 -> requireAlphaNum username2 *>
                          checkUsernameLength username2
-
-
---doValidateUsername :: Username -> Validation Error Username
---doValidateUsername (Username username) =
---  do
---    cleanUser <- cleanWhitespace username
---    alphaNumUser <- requireAlphaNum cleanUser
---    checkUsernameLength alphaNumUser
 
 
 makeUser :: Username -> Password -> Validation Error User
@@ -114,10 +108,10 @@ usernameErrors username =
 displayErrors :: Username -> Password -> IO ()
 displayErrors name password =
   case makeUser name password of
-    Failure err -> putStrLn (unlines (errorCoerce err))
+    Failure err -> TIO.putStrLn (T.unlines (errorCoerce err))
     Success (User (Username name) password) ->
-      putStrLn ("Welcome, " ++ name)
+      TIO.putStrLn ("Welcome, " <> name)
 
 
-errorCoerce :: Error -> [String]
+errorCoerce :: Error -> [T.Text]
 errorCoerce (Error err) = err   

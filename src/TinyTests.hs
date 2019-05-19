@@ -1,7 +1,8 @@
+{-# LANGUAGE OverloadedStrings #-}
 module TinyTests where
 
 import Lib
-
+import qualified Data.Text as T
 
 -- takes a test result and prints it nicely to the terminal
 printTestResult :: Either Error () -> IO ()
@@ -17,9 +18,9 @@ eq n actual expected =
   case (actual == expected) of
     True -> Right ()
     False -> Left (Error (
-                 [ "Test " ++ show n
-                 , "  Expected:  " ++ show expected
-                 , "  But got:  " ++ show actual
+                 [ "Test " <> (T.pack $ show n)
+                 , "  Expected:  " <> (T.pack $ show expected)
+                 , "  But got:  " <> (T.pack $ show actual)
                  ]))
 
 
