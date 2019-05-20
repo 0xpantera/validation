@@ -57,8 +57,10 @@ requireAlphaNum xs =
 
 
 cleanWhitespace :: T.Text -> Validation Error T.Text
-cleanWhitespace "" = Failure (Error ["Cannot be empty"])
-cleanWhitespace text = Success $ T.strip text
+cleanWhitespace input =
+  if T.null (T.strip input)
+  then Failure (Error ["Cannot be empty"])
+  else Success $ T.strip input
 
 
 validatePassword :: Password -> Validation Error Password
