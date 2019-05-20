@@ -14,8 +14,11 @@ newtype Password = Password T.Text
   deriving Show
 
 
-newtype Error = Error [T.Text]
-  deriving (Show, Semigroup)
+newtype Error = Error T.Text
+  deriving Show
+
+instance Semigroup Error where
+  Error xs <> Error ys = Error (xs <> (T.pack "\n") <> ys)
 
 
 newtype Username = Username T.Text
@@ -29,23 +32,24 @@ data User = User Username Password
 checkPasswordLength :: T.Text -> Validation Error Password
 checkPasswordLength password =
   case (T.length password > 20 || T.length password < 10) of
-    True -> Failure (Error ["Your password has to be between 10 and 20 characters long"])
+    True -> Failure (Error "Your password has to be between 10 and 20 characters long")
     False -> Success (Password password)
 
 
 checkUsernameLength :: T.Text -> Validation Error Username
 checkUsernameLength name =
   case (T.length name > 15) of
-    True -> Failure (Error ["Username cannot be longer than 15 characters."])
+    True -> Failure (Error "Username cannot be longer than 15 characters.")
     False -> Success (Username name)
 
 
 checkLength :: Int -> T.Text -> Validation Error T.Text
 checkLength n field =
   case (T.length field > n) of
-    True -> Failure (Error ["Fields cannot be longer than "
-                           <> (T.pack $ show n)
-                           <> " characters"])
+    True -> Failure (Error
+                     $ "Fields cannot be longer than "
+                     <> (T.pack $ show n)
+                     <> " characters")
     False -> Success field
 
 
@@ -53,13 +57,13 @@ requireAlphaNum :: T.Text -> Validation Error T.Text
 requireAlphaNum xs =
   case (T.all isAlphaNum xs) of
     True -> Success xs
-    False -> Failure (Error ["Cannot contain whitespace or special characters."])
+    False -> Failure (Error "Cannot contain whitespace or special characters.")
 
 
 cleanWhitespace :: T.Text -> Validation Error T.Text
 cleanWhitespace input =
   if T.null (T.strip input)
-  then Failure (Error ["Cannot be empty"])
+  then Failure (Error "Cannot be empty")
   else Success $ T.strip input
 
 
@@ -94,7 +98,7 @@ makeUserTmpPassword name =
 passwordErrors :: Password -> Validation Error Password
 passwordErrors password =
   case validatePassword password of
-    Failure err -> Failure (Error ["Invalid password:"]
+    Failure err -> Failure (Error "Invalid password:"
                             <> err)
     Success password2 -> Success password2
 
@@ -102,7 +106,7 @@ passwordErrors password =
 usernameErrors :: Username -> Validation Error Username
 usernameErrors username =
   case validateUsername username of
-    Failure err -> Failure (Error ["Invalid username:"]
+    Failure err -> Failure (Error "Invalid username:"
                             <> err)
     Success username2 -> Success username2
 
@@ -110,10 +114,10 @@ usernameErrors username =
 displayErrors :: Username -> Password -> IO ()
 displayErrors name password =
   case makeUser name password of
-    Failure err -> TIO.putStrLn (T.unlines (errorCoerce err))
+    Failure err -> TIO.putStrLn (errorCoerce err)
     Success (User (Username name) password) ->
       TIO.putStrLn ("Welcome, " <> name)
 
 
-errorCoerce :: Error -> [T.Text]
+errorCoerce :: Error -> T.Text
 errorCoerce (Error err) = err   
