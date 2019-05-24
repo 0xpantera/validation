@@ -32,8 +32,11 @@ data User = User Username Password
   deriving Show
 
 
-checkPasswordLength :: T.Text -> Validation Error Password
-checkPasswordLength password =
+type Rule a = (a -> Validation Error a)
+
+
+checkPasswordLength :: Rule Password
+checkPasswordLength (Password password) =
   case (T.length password > 20 || T.length password < 10) of
     True -> Failure (toError "Your password has to be between 10 and 20 characters long")
     False -> Success (Password password)
@@ -56,25 +59,26 @@ checkLength n field =
     False -> Success field
 
 
-requireAlphaNum :: T.Text -> Validation Error T.Text
+requireAlphaNum :: Rule T.Text
 requireAlphaNum xs =
   case (T.all isAlphaNum xs) of
     True -> Success xs
     False -> Failure (toError "Cannot contain whitespace or special characters.")
 
 
-cleanWhitespace :: T.Text -> Validation Error T.Text
+cleanWhitespace :: Rule T.Text
 cleanWhitespace input =
   if T.null (T.strip input)
   then Failure (toError "Cannot be empty")
   else Success $ T.strip input
 
 
-validatePassword :: Password -> Validation Error Password
-validatePassword (Password password) =
-  case (cleanWhitespace password) of
+validatePassword :: Rule Password
+validatePassword password =
+  case (coerce cleanWhitespace :: Rule Password) password of
     Failure err -> Failure err
-    Success password2 -> requireAlphaNum password2 *>
+    Success password2 ->
+      (coerce requireAlphaNum :: Rule Password) password2 *>
                          checkPasswordLength password2
 
 
