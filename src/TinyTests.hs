@@ -18,10 +18,10 @@ eq n actual expected =
   case (actual == expected) of
     True -> Right ()
     False -> Left (Error (
-                 [ "Test " <> (T.pack $ show n)
-                 , "  Expected:  " <> (T.pack $ show expected)
-                 , "  But got:  " <> (T.pack $ show actual)
-                 ]))
+                  "Test " <> (T.pack $ show n)
+                 <> "  Expected:  " <> (T.pack $ show expected)
+                 <> "  But got:  " <> (T.pack $ show actual)
+                 ))
 
 
 --test :: IO ()
