@@ -4,6 +4,7 @@
 module Lib where
 
 import Data.Char
+import Data.Coerce
 import Data.Validation
 import Data.Semigroup
 import qualified Data.Text as T
@@ -116,10 +117,6 @@ usernameErrors username =
 displayErrors :: Username -> Password -> IO ()
 displayErrors name password =
   case makeUser name password of
-    Failure err -> TIO.putStrLn (errorCoerce err)
+    Failure err -> TIO.putStrLn (coerce err)
     Success (User (Username name) password) ->
       TIO.putStrLn ("Welcome, " <> name)
-
-
-errorCoerce :: Error -> T.Text
-errorCoerce (Error err) = err   
