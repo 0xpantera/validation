@@ -3,6 +3,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Lib where
 
+import Control.Lens
 import Data.Char
 import Data.Coerce
 import Data.Validation
@@ -23,6 +24,7 @@ instance Semigroup Error where
 
 toError :: T.Text -> Error
 toError input = Error input
+
 
 newtype Username = Username T.Text
   deriving Show
@@ -82,7 +84,7 @@ validatePassword password =
                          checkPasswordLength password2
 
 
-validateUsername :: Username -> Validation Error Username
+validateUsername :: Rule Username
 validateUsername (Username username) =
   case (cleanWhitespace username) of
     Failure err -> Failure err
@@ -90,8 +92,9 @@ validateUsername (Username username) =
                          checkUsernameLength username2
 
 
-makeUser :: Username -> Password -> Validation Error User
+makeUser :: Validate v => Username -> Password -> v Error User
 makeUser name pass =
+  review _Validation $
   User <$> (usernameErrors name)
        <*> (passwordErrors pass)
 
@@ -118,8 +121,8 @@ usernameErrors username =
     Success username2 -> Success username2
 
 
-displayErrors :: Username -> Password -> IO ()
-displayErrors name password =
+display :: Username -> Password -> IO ()
+display name password =
   case makeUser name password of
     Failure err -> TIO.putStrLn (coerce err)
     Success (User (Username name) password) ->
